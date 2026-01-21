@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}Каталог товаров{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-9">
+        <h2><i class="fas fa-shopping-bag"></i> Каталог товаров</h2>
+    </div>
+    <div class="col-md-3">
+        <select class="form-select" onchange="location.href='?category=' + this.value">
+            <option value="">Все категории</option>
+            {% for category in categories %}
+                <option value="{{ category.id }}">{{ category.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+</div>
+
+<div class="row">
+    {% for product in products %}
+    <div class="col-md-4 mb-4">
+        <div class="card product-card h-100">
+            {% if product.active_promotion %}
+            <div class="promotion-badge">
+                <i class="fas fa-tag"></i> -{{ product.active_promotion.discount_percent }}%
+            </div>
+            {% endif %}
+            
+            <div class="card-img-top bg-light text-center p-4" style="height: 200px;">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" style="max-height: 100%; max-width: 100%;">
+                {% else %}
+                    <i class="fas fa-box fa-5x text-muted"></i>
+                {% endif %}
+            </div>
+            
+            <div class="card-body">
+                <span class="badge bg-secondary mb-2">{{ product.category.name }}</span>
+                <h5 class="card-title">{{ product.name }}</h5>
+                <p class="card-text text-muted">{{ product.description|truncatewords:15 }}</p>
+                
+                {% if product.active_promotion %}
+                <div>
+                    <small class="text-muted text-decoration-line-through">{{ product.price }} ₸</small>
+                    <h4 class="text-danger">{{ product.discounted_price|floatformat:2 }} ₸</h4>
+                </div>
+                {% else %}
+                <h4 class="text-primary">{{ product.price }} ₸</h4>
+                {% endif %}
+                
+                <div class="mt-2">
+                    {% if product.average_rating %}
+                        {% for i in "12345" %}
+                            {% if i|add:"0" <= product.average_rating %}
+                                <i class="fas fa-star text-warning"></i>
+                            {% else %}
+                                <i class="far fa-star text-muted"></i>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                    <small class="text-muted">
+                        {% if product.stock > 0 %}
+                            <i class="fas fa-check-circle text-success"></i> В наличии
+                        {% else %}
+                            <i class="fas fa-times-circle text-danger"></i> Нет в наличии
+                        {% endif %}
+                    </small>
+                </div>
+            </div>
+            
+            <div class="card-footer">
+                <a href="{% url 'core:product_detail' product.id %}" class="btn btn-primary w-100">
+                    <i class="fas fa-eye"></i> Подробнее
+                </a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-md-12">
+        <div class="alert alert-info text-center">
+            <i class="fas fa-info-circle"></i> Товары не найдены
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

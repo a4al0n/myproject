@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Все отзывы{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h2><i class="fas fa-star text-warning"></i> Отзывы пользователей</h2>
+        <p class="lead">Читайте отзывы покупателей о товарах</p>
+    </div>
+</div>
+
+<div class="row">
+    {% for review in reviews %}
+    <div class="col-md-12 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h5 class="card-title">
+                            <i class="fas fa-user-circle text-primary"></i>
+                            <strong>{{ review.user.username }}</strong>
+                        </h5>
+                        <h6 class="text-muted">
+                            <a href="{% url 'core:product_detail' review.product.id %}" class="text-decoration-none">
+                                {{ review.product.name }}
+                            </a>
+                        </h6>
+                    </div>
+                    <div class="text-end">
+                        <div class="mb-2">
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= review.rating %}
+                                    <i class="fas fa-star text-warning"></i>
+                                {% else %}
+                                    <i class="far fa-star text-muted"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <small class="text-muted">{{ review.created_at|date:"d.m.Y H:i" }}</small>
+                    </div>
+                </div>
+                <hr>
+                <p class="card-text">{{ review.text|linebreaksbr }}</p>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-md-12">
+        <div class="alert alert-info text-center">
+            <i class="fas fa-info-circle"></i> Отзывов пока нет. Будьте первым!
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

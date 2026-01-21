@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+
+{% block title %}Управление модулями{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h2><i class="fas fa-puzzle-piece"></i> Управление модулями</h2>
+        <p class="lead">Динамическое включение и отключение функциональных модулей</p>
+        <hr>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Модуль отзывов -->
+    <div class="col-md-6 mb-4">
+        <div class="card {% if modules.reviews.enabled %}border-success{% else %}border-secondary{% endif %}">
+            <div class="card-header {% if modules.reviews.enabled %}bg-success text-white{% else %}bg-secondary text-white{% endif %}">
+                <h5 class="mb-0">
+                    <i class="fas fa-star"></i> Модуль "Отзывы"
+                    {% if modules.reviews.enabled %}
+                        <span class="badge bg-light text-success float-end">Активен</span>
+                    {% else %}
+                        <span class="badge bg-light text-secondary float-end">Отключен</span>
+                    {% endif %}
+                </h5>
+            </div>
+            <div class="card-body">
+                <h6>Описание:</h6>
+                <p>Позволяет пользователям оставлять отзывы о товарах с текстом и рейтингом от 1 до 5 звезд.</p>
+                
+                <h6>Функции:</h6>
+                <ul>
+                    <li>Создание отзывов для товаров</li>
+                    <li>Система рейтинга (1-5 звезд)</li>
+                    <li>Просмотр всех отзывов</li>
+                    <li>Фильтрация отзывов по товарам</li>
+                    <li>REST API для работы с отзывами</li>
+                </ul>
+                
+                {% if modules.reviews.enabled %}
+                <div class="alert alert-success">
+                    <strong>Статус:</strong> Модуль активен и доступен в системе
+                    <hr>
+                    <p class="mb-0">
+                        <a href="{% url 'reviews:review_list' %}" class="btn btn-sm btn-success">
+                            <i class="fas fa-eye"></i> Просмотр отзывов
+                        </a>
+                        <a href="/api/reviews/api/" class="btn btn-sm btn-outline-success ms-2">
+                            <i class="fas fa-code"></i> API Endpoint
+                        </a>
+                    </p>
+                </div>
+                {% else %}
+                <div class="alert alert-secondary">
+                    <strong>Статус:</strong> Модуль отключен
+                    <p class="mb-0 mt-2">Для включения измените <code>MODULES_CONFIG</code> в settings.py</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Модуль акций -->
+    <div class="col-md-6 mb-4">
+        <div class="card {% if modules.promotions.enabled %}border-success{% else %}border-secondary{% endif %}">
+            <div class="card-header {% if modules.promotions.enabled %}bg-success text-white{% else %}bg-secondary text-white{% endif %}">
+                <h5 class="mb-0">
+                    <i class="fas fa-tag"></i> Модуль "Акции"
+                    {% if modules.promotions.enabled %}
+                        <span class="badge bg-light text-success float-end">Активен</span>
+                    {% else %}
+                        <span class="badge bg-light text-secondary float-end">Отключен</span>
+                    {% endif %}
+                </h5>
+            </div>
+            <div class="card-body">
+                <h6>Описание:</h6>
+                <p>Управление акциями и специальными предложениями с автоматическим расчетом скидок.</p>
+                
+                <h6>Функции:</h6>
+                <ul>
+                    <li>Создание акций со скидками</li>
+                    <li>Установка периода действия</li>
+                    <li>Автоматический расчет цены со скидкой</li>
+                    <li>Фильтрация активных/завершенных акций</li>
+                    <li>REST API для управления акциями</li>
+                </ul>
+                
+                {% if modules.promotions.enabled %}
+                <div class="alert alert-success">
+                    <strong>Статус:</strong> Модуль активен и доступен в системе
+                    <hr>
+                    <p class="mb-0">
+                        <a href="{% url 'promotions:promotion_list' %}" class="btn btn-sm btn-success">
+                            <i class="fas fa-eye"></i> Просмотр акций
+                        </a>
+                        <a href="/api/promotions/api/" class="btn btn-sm btn-outline-success ms-2">
+                            <i class="fas fa-code"></i> API Endpoint
+                        </a>
+                    </p>
+                </div>
+                {% else %}
+                <div class="alert alert-secondary">
+                    <strong>Статус:</strong> Модуль отключен
+                    <p class="mb-0 mt-2">Для включения измените <code>MODULES_CONFIG</code> в settings.py</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-info-circle"></i> Инструкция по управлению модулями</h5>
+            </div>
+            <div class="card-body">
+                <h6>Как включить/отключить модуль:</h6>
+                <ol>
+                    <li>Откройте файл <code>shop/settings.py</code></li>
+                    <li>Найдите секцию <code>MODULES_CONFIG</code>:</li>
+                </ol>
+                
+                <pre class="bg-light p-3 rounded"><code>MODULES_CONFIG = {
+    'reviews': {
+        'enabled': True,  # Измените на False для отключения
+        'app_name': 'reviews',
+    },
+    'promotions': {
+        'enabled': True,  # Измените на False для отключения
+        'app_name': 'promotions',
+    }
+}</code></pre>
+
+                <ol start="3">
+                    <li>Измените значение <code>enabled</code> на <code>True</code> или <code>False</code></li>
+                    <li>Перезапустите сервер Django: <code>python manage.py runserver</code></li>
+                    <li>Обновите эту страницу, чтобы увидеть изменения</li>
+                </ol>
+
+                <div class="alert alert-warning mt-3">
+                    <strong><i class="fas fa-exclamation-triangle"></i> Важно:</strong>
+                    <ul class="mb-0">
+                        <li>При отключении модуля его URL маршруты не регистрируются</li>
+                        <li>Основной функционал магазина продолжает работать без отключенных модулей</li>
+                        <li>Данные модулей остаются в базе данных при отключении</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card border-primary">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-rocket"></i> API Endpoints</h5>
+            </div>
+            <div class="card-body">
+                <h6>Основное API:</h6>
+                <ul>
+                    <li><code>GET /api/products/</code> - Список товаров</li>
+                    <li><code>GET /api/categories/</code> - Список категорий</li>
+                </ul>
+
+                {% if modules.reviews.enabled %}
+                <h6>API Отзывов:</h6>
+                <ul>
+                    <li><code>GET /api/reviews/api/</code> - Список отзывов</li>
+                    <li><code>POST /api/reviews/api/</code> - Создать отзыв</li>
+                    <li><code>GET /api/reviews/api/by_product/?product_id=X</code> - Отзывы товара</li>
+                    <li><code>GET /api/reviews/api/my_reviews/</code> - Мои отзывы</li>
+                </ul>
+                {% endif %}
+
+                {% if modules.promotions.enabled %}
+                <h6>API Акций:</h6>
+                <ul>
+                    <li><code>GET /api/promotions/api/?active=true</code> - Активные акции</li>
+                    <li><code>GET /api/promotions/api/by_product/?product_id=X</code> - Акции товара</li>
+                    <li><code>GET /api/promotions/api/upcoming/</code> - Предстоящие акции</li>
+                    <li><code>GET /api/promotions/api/expired/</code> - Завершенные акции</li>
+                </ul>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

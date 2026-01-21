@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block title %}Главная{% endblock %}
+
+{% block content %}
+<!-- Hero секция -->
+<div class="jumbotron bg-primary text-white p-5 rounded mb-4">
+    <h1 class="display-4"><i class="fas fa-store"></i> Добро пожаловать!</h1>
+    <p class="lead">Интернет-магазин с модульной архитектурой Django</p>
+    <hr class="my-4 bg-white">
+    <p>Демонстрация динамического подключения модулей "Отзывы" и "Акции"</p>
+    <a class="btn btn-light btn-lg" href="{% url 'core:product_list' %}">
+        <i class="fas fa-shopping-bag"></i> Посмотреть товары
+    </a>
+    <a class="btn btn-outline-light btn-lg ms-2" href="{% url 'core:modules_management' %}">
+        <i class="fas fa-cog"></i> Управление модулями
+    </a>
+</div>
+
+<!-- Популярные товары -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h2><i class="fas fa-fire text-danger"></i> Популярные товары</h2>
+        <hr>
+    </div>
+</div>
+
+<div class="row">
+    {% for product in products %}
+    <div class="col-md-3 mb-4">
+        <div class="card product-card h-100">
+            {% if product.active_promotion %}
+            <div class="promotion-badge">
+                <i class="fas fa-tag"></i> -{{ product.active_promotion.discount_percent }}%
+            </div>
+            {% endif %}
+            
+            <div class="card-img-top bg-light text-center p-4" style="height: 200px;">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" style="max-height: 100%; max-width: 100%;">
+                {% else %}
+                    <i class="fas fa-box fa-5x text-muted"></i>
+                {% endif %}
+            </div>
+            
+            <div class="card-body">
+                <h5 class="card-title">{{ product.name|truncatewords:5 }}</h5>
+                <p class="card-text text-muted">{{ product.description|truncatewords:10 }}</p>
+                
+                {% if product.active_promotion %}
+                <div class="mb-2">
+                    <small class="text-muted text-decoration-line-through">{{ product.price }} ₸</small>
+                    <h4 class="text-danger mb-0">{{ product.discounted_price|floatformat:2 }} ₸</h4>
+                </div>
+                {% else %}
+                <h4 class="text-primary">{{ product.price }} ₸</h4>
+                {% endif %}
+                
+                {% if product.average_rating %}
+                <div class="mb-2">
+                    {% for i in "12345" %}
+                        {% if i|add:"0" <= product.average_rating %}
+                            <i class="fas fa-star text-warning"></i>
+                        {% else %}
+                            <i class="far fa-star text-muted"></i>
+                        {% endif %}
+                    {% endfor %}
+                    <small class="text-muted">({{ product.average_rating }})</small>
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="card-footer">
+                <a href="{% url 'core:product_detail' product.id %}" class="btn btn-primary w-100">
+                    <i class="fas fa-eye"></i> Подробнее
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Категории -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h2><i class="fas fa-th-large"></i> Категории</h2>
+        <hr>
+    </div>
+</div>
+
+<div class="row">
+    {% for category in categories %}
+    <div class="col-md-3 mb-3">
+        <a href="{% url 'core:product_list' %}?category={{ category.id }}" class="text-decoration-none">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-folder fa-3x text-primary mb-3"></i>
+                    <h5 class="card-title">{{ category.name }}</h5>
+                    <p class="text-muted">{{ category.products.count }} товаров</p>
+                </div>
+            </div>
+        </a>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

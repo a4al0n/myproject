@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block title %}Акции и скидки{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h2><i class="fas fa-tags text-danger"></i> Актуальные акции и спецпредложения</h2>
+        <p class="lead">Не упустите выгодные предложения!</p>
+    </div>
+</div>
+
+<div class="row">
+    {% for promotion in promotions %}
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card h-100 border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-fire"></i> {{ promotion.title }}
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    <div class="badge bg-danger fs-3 p-3">
+                        -{{ promotion.discount_percent }}%
+                    </div>
+                </div>
+
+                <h6 class="card-subtitle mb-2">
+                    <a href="{% url 'core:product_detail' promotion.product.id %}" class="text-decoration-none">
+                        <i class="fas fa-box"></i> {{ promotion.product.name }}
+                    </a>
+                </h6>
+
+                <p class="card-text">{{ promotion.description }}</p>
+
+                <hr>
+
+                <div class="row">
+                    <div class="col-6">
+                        <small class="text-muted">Старая цена:</small>
+                        <div class="text-decoration-line-through text-muted">
+                            {{ promotion.product.price }} ₸
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <small class="text-muted">Новая цена:</small>
+                        <div class="text-danger fw-bold fs-5">
+                            {{ promotion.product.discounted_price|floatformat:2 }} ₸
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-warning mt-3 mb-0">
+                    <small>
+                        <i class="fas fa-clock"></i>
+                        <strong>До:</strong> {{ promotion.end_date|date:"d.m.Y H:i" }}
+                    </small>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'core:product_detail' promotion.product.id %}" class="btn btn-danger">
+                        <i class="fas fa-shopping-cart"></i> Перейти к товару
+                    </a>
+                    <a href="{% url 'promotions:promotion_detail' promotion.id %}" class="btn btn-outline-danger btn-sm">
+                        <i class="fas fa-info-circle"></i> Подробнее
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-md-12">
+        <div class="alert alert-info text-center">
+            <i class="fas fa-info-circle"></i> В данный момент нет активных акций. Следите за обновлениями!
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

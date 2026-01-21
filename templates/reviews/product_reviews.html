@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}Отзывы - {{ product.name }}{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'core:index' %}">Главная</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'core:product_detail' product.id %}">{{ product.name }}</a></li>
+                <li class="breadcrumb-item active">Отзывы</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2><i class="fas fa-star text-warning"></i> Отзывы о товаре</h2>
+        <h4 class="text-muted">{{ product.name }}</h4>
+    </div>
+    <div class="col-md-4 text-end">
+        {% if user.is_authenticated %}
+            <a href="{% url 'reviews:add_review' product.id %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Добавить отзыв
+            </a>
+        {% else %}
+            <a href="{% url 'admin:index' %}" class="btn btn-outline-primary">
+                <i class="fas fa-sign-in-alt"></i> Войдите, чтобы оставить отзыв
+            </a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        {% if reviews %}
+            <div class="alert alert-info mb-4">
+                <strong>Средний рейтинг:</strong>
+                {% if product.average_rating %}
+                    {{ product.average_rating }} из 5
+                    {% for i in "12345" %}
+                        {% if i|add:"0" <= product.average_rating %}
+                            <i class="fas fa-star text-warning"></i>
+                        {% else %}
+                            <i class="far fa-star text-muted"></i>
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    Нет оценок
+                {% endif %}
+                <span class="ms-2">({{ reviews.count }} отзыв{{ reviews.count|pluralize:"ов,а,ов" }})</span>
+            </div>
+        {% endif %}
+
+        {% for review in reviews %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h5 class="card-title">
+                            <i class="fas fa-user-circle text-primary"></i>
+                            <strong>{{ review.user.username }}</strong>
+                        </h5>
+                    </div>
+                    <div class="text-end">
+                        <div class="mb-2">
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= review.rating %}
+                                    <i class="fas fa-star text-warning"></i>
+                                {% else %}
+                                    <i class="far fa-star text-muted"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <small class="text-muted">{{ review.created_at|date:"d.m.Y H:i" }}</small>
+                    </div>
+                </div>
+                <hr>
+                <p class="card-text">{{ review.text|linebreaksbr }}</p>
+            </div>
+        </div>
+        {% empty %}
+        <div class="alert alert-info text-center">
+            <i class="fas fa-info-circle"></i> 
+            Для этого товара пока нет отзывов. 
+            {% if user.is_authenticated %}
+                <a href="{% url 'reviews:add_review' product.id %}">Будьте первым!</a>
+            {% else %}
+                Войдите, чтобы оставить отзыв.
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

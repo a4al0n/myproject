@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ product.name }}{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'core:index' %}">Главная</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'core:product_list' %}">Товары</a></li>
+                <li class="breadcrumb-item active">{{ product.name }}</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body text-center p-5">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="img-fluid">
+                {% else %}
+                    <i class="fas fa-box fa-10x text-muted"></i>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <h2>{{ product.name }}</h2>
+        <p class="text-muted">{{ product.category.name }}</p>
+        
+        {% if product.average_rating %}
+        <div class="mb-3">
+            {% for i in "12345" %}
+                {% if i|add:"0" <= product.average_rating %}
+                    <i class="fas fa-star text-warning"></i>
+                {% else %}
+                    <i class="far fa-star text-muted"></i>
+                {% endif %}
+            {% endfor %}
+            <span class="ms-2">{{ product.average_rating }} из 5</span>
+        </div>
+        {% endif %}
+        
+        <hr>
+        
+        <div class="mb-4">
+            <h5>Описание:</h5>
+            <p>{{ product.description }}</p>
+        </div>
+        
+        {% if product.active_promotion %}
+        <div class="alert alert-danger">
+            <h5><i class="fas fa-fire"></i> Акция: {{ product.active_promotion.title }}</h5>
+            <p>{{ product.active_promotion.description }}</p>
+            <div class="row">
+                <div class="col-6">
+                    <small>Обычная цена:</small>
+                    <h5 class="text-decoration-line-through">{{ product.price }} ₸</h5>
+                </div>
+                <div class="col-6">
+                    <small>Цена по акции:</small>
+                    <h3 class="text-danger">{{ product.discounted_price|floatformat:2 }} ₸</h3>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="card bg-light mb-4">
+            <div class="card-body">
+                <h3 class="text-primary">{{ product.price }} ₸</h3>
+            </div>
+        </div>
+        {% endif %}
+        
+        <div class="mb-3">
+            <span class="badge bg-success">
+                <i class="fas fa-boxes"></i> В наличии: {{ product.stock }} шт.
+            </span>
+        </div>
+        
+        <div class="d-grid gap-2">
+            <button class="btn btn-primary btn-lg">
+                <i class="fas fa-shopping-cart"></i> Добавить в корзину
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Отзывы (если модуль включен) -->
+{% if reviews_enabled %}
+<div class="row mt-5">
+    <div class="col-md-12">
+        <h3><i class="fas fa-star text-warning"></i> Отзывы покупателей</h3>
+        <hr>
+        
+        {% if reviews %}
+            {% for review in reviews|slice:":3" %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <h5><i class="fas fa-user-circle"></i> {{ review.user.username }}</h5>
+                        <div>
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= review.rating %}
+                                    <i class="fas fa-star text-warning"></i>
+                                {% else %}
+                                    <i class="far fa-star text-muted"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <p class="mt-2">{{ review.text|truncatewords:30 }}</p>
+                    <small class="text-muted">{{ review.created_at|date:"d.m.Y" }}</small>
+                </div>
+            </div>
+            {% endfor %}
+            
+            <a href="{% url 'reviews:product_reviews' product.id %}" class="btn btn-outline-primary">
+                <i class="fas fa-comment"></i> Все отзывы ({{ reviews.count }})
+            </a>
+        {% else %}
+            <p class="text-muted">Отзывов пока нет.</p>
+        {% endif %}
+        
+        {% if user.is_authenticated %}
+            <a href="{% url 'reviews:add_review' product.id %}" class="btn btn-primary ms-2">
+                <i class="fas fa-plus"></i> Оставить отзыв
+            </a>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Акции (если модуль включен) -->
+{% if promotions_enabled and promotions %}
+<div class="row mt-5">
+    <div class="col-md-12">
+        <h3><i class="fas fa-tags text-danger"></i> Специальные предложения</h3>
+        <hr>
+        
+        {% for promotion in promotions %}
+        <div class="alert alert-danger">
+            <h5>{{ promotion.title }} (-{{ promotion.discount_percent }}%)</h5>
+            <p>{{ promotion.description }}</p>
+            <small>Действует до: {{ promotion.end_date|date:"d.m.Y H:i" }}</small>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}

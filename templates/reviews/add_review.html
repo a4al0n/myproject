@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}Добавить отзыв - {{ product.name }}{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'core:index' %}">Главная</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'core:product_detail' product.id %}">{{ product.name }}</a></li>
+                <li class="breadcrumb-item active">Добавить отзыв</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="fas fa-pen"></i> Оставить отзыв</h4>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <h5>Товар: <span class="text-primary">{{ product.name }}</span></h5>
+                    <p class="text-muted">{{ product.description|truncatewords:20 }}</p>
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="rating" class="form-label">
+                            <strong>Рейтинг <span class="text-danger">*</span></strong>
+                        </label>
+                        <select class="form-select" id="rating" name="rating" required>
+                            <option value="">Выберите оценку</option>
+                            <option value="5">⭐⭐⭐⭐⭐ Отлично (5)</option>
+                            <option value="4">⭐⭐⭐⭐ Хорошо (4)</option>
+                            <option value="3">⭐⭐⭐ Нормально (3)</option>
+                            <option value="2">⭐⭐ Плохо (2)</option>
+                            <option value="1">⭐ Ужасно (1)</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="text" class="form-label">
+                            <strong>Ваш отзыв <span class="text-danger">*</span></strong>
+                        </label>
+                        <textarea 
+                            class="form-control" 
+                            id="text" 
+                            name="text" 
+                            rows="6" 
+                            placeholder="Расскажите о своих впечатлениях от товара..."
+                            required
+                        ></textarea>
+                        <div class="form-text">Минимум 10 символов</div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-paper-plane"></i> Отправить отзыв
+                        </button>
+                        <a href="{% url 'core:product_detail' product.id %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times"></i> Отмена
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
